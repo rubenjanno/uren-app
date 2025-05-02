@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Uren App</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; }
+    input { margin-bottom: 1rem; display: block; }
+    button { margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Uren Calculator</h1>
+
+  <label>Starttijd: <input type="time" id="start"></label>
+  <label>Eindtijd: <input type="time" id="end"></label>
+  <label>Pauze (minuten): <input type="number" id="pause" value="0"></label>
+
+  <button onclick="berekenUren()">Bereken gewerkte uren</button>
+
+  <p id="resultaat"></p>
+
+  <script>
+    function berekenUren() {
+      const start = document.getElementById('start').value;
+      const end = document.getElementById('end').value;
+      const pause = parseInt(document.getElementById('pause').value) || 0;
+
+      if (!start || !end) {
+        document.getElementById('resultaat').innerText = "Vul start- en eindtijd in.";
+        return;
+      }
+
+      const [sh, sm] = start.split(':').map(Number);
+      const [eh, em] = end.split(':').map(Number);
+
+      const startMinuten = sh * 60 + sm;
+      const eindMinuten = eh * 60 + em;
+      const gewerkteMinuten = Math.max(0, eindMinuten - startMinuten - pause);
+      const uren = (gewerkteMinuten / 60).toFixed(2);
+
+      document.getElementById('resultaat').innerText = `Gewerkte uren: ${uren}`;
+    }
+  </script>
+</body>
+</html>
