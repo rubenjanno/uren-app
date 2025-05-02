@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Uren App</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 1rem;
+      max-width: 100%;
+      margin: auto;
+      box-sizing: border-box;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .buttons {
+      display: flex;
+      gap: 4px;
+    }
+    input.time {
+      font-size: 1.6rem;
+      width: 80px;
+      text-align: center;
+    }
+    button {
+      font-size: 1.5rem;
+      padding: 0.4rem;
+    }
+    #totaal {
+      font-size: 1.6rem;
+      margin-top: 1.2rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center;">Uren Calculator</h1>
+
+  <div class="row">
+    <div class="buttons">
+      <button onclick="adjustTime('start', -60)">«</button>
+      <button onclick="adjustTime('start', -5)"><</button>
+    </div>
+    <input id="start" class="time" value="08:00" readonly />
+    <div class="buttons">
+      <button onclick="adjustTime('start', 5)">></button>
+      <button onclick="adjustTime('start', 60)">»</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="buttons">
+      <button onclick="adjustTime('end', -60)">«</button>
+      <button onclick="adjustTime('end', -5)"><</button>
+    </div>
+    <input id="end" class="time" value="17:00" readonly />
+    <div class="buttons">
+      <button onclick="adjustTime('end', 5)">></button>
+      <button onclick="adjustTime('end', 60)">»</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="buttons">
+      <button onclick="adjustTime('pause', -60)">«</button>
+      <button onclick="adjustTime('pause', -5)"><</button>
+    </div>
+    <input id="pause" class="time" value="00:30" readonly />
+    <div class="buttons">
+      <button onclick="adjustTime('pause', 5)">></button>
+      <button onclick="adjustTime('pause', 60)">»</button>
+    </div>
+  </div>
+
+  <div id="totaal">Totaal: 08:30 u</div>
+
+  <script>
+    function parseTime(t) {
+      const [h, m] = t.split(":").map(Number);
+      return h * 60 + m;
+    }
+
+    function formatTime(totalMinutes) {
+      const h = Math.floor(totalMinutes / 60);
+      const m = totalMinutes % 60;
+      return ('0' + h).slice(-2) + ':' + ('0' + m).slice(-2);
+    }
+
+    function adjustTime(field, delta) {
+      const el = document.getElementById(field);
+      const time = parseTime(el.value);
+      let newTime = time + delta;
+      if (field === 'pause') {
+        newTime = Math.max(0, newTime); // geen negatieve pauze
+      } else {
+        newTime = (newTime + 1440) % 1440; // rond de klok
+      }
+      el.value = formatTime(newTime);
+      updateTotal();
+    }
+
+    function updateTotal() {
+      const start = parseTime(document.getElementById('start').value);
+      const end = parseTime(document.getElementById('end').value);
+      const pause = parseTime(document.getElementById('pause').value);
+
+      let worked = end - start - pause;
+      if (worked < 0) worked += 1440; // over middernacht
+
+      const uren = Math.floor(worked / 60);
+      const minuten = worked % 60;
+      document.getElementById('totaal').innerText = 'Totaal: ' + ('0' + uren).slice(-2) + ':' + ('0' + minuten).slice(-2) + ' u';
+    }
+
+    updateTotal(); // initiale berekening
+  </script>
+</body>
+</html>
