@@ -1,46 +1,97 @@
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Uren App</title>
   <style>
-    body { font-family: sans-serif; padding: 2rem; }
-    input { margin-bottom: 1rem; display: block; }
-    button { margin-top: 1rem; }
+    body { font-family: sans-serif; padding: 2rem; max-width: 500px; margin: auto; }
+    .row { display: flex; align-items: center; margin-bottom: 1rem; }
+    .buttons { display: flex; gap: 4px; }
+    input.time { font-size: 1.5rem; width: 100px; text-align: center; }
+    button { font-size: 1rem; padding: 0.5rem; }
+    #totaal { font-size: 1.5rem; margin-top: 2rem; }
   </style>
 </head>
 <body>
   <h1>Uren Calculator</h1>
 
-  <label>Starttijd: <input type="time" id="start"></label>
-  <label>Eindtijd: <input type="time" id="end"></label>
-  <label>Pauze (minuten): <input type="number" id="pause" value="0"></label>
+  <div class="row">
+    <div class="buttons">
+      <button onclick="adjustTime('start', -60)">«</button>
+      <button onclick="adjustTime('start', -5)"><</button>
+    </div>
+    <input id="start" class="time" value="08:00" readonly />
+    <div class="buttons">
+      <button onclick="adjustTime('start', 5)">></button>
+      <button onclick="adjustTime('start', 60)">»</button>
+    </div>
+  </div>
 
-  <button onclick="berekenUren()">Bereken gewerkte uren</button>
+  <div class="row">
+    <div class="buttons">
+      <button onclick="adjustTime('end', -60)">«</button>
+      <button onclick="adjustTime('end', -5)"><</button>
+    </div>
+    <input id="end" class="time" value="17:00" readonly />
+    <div class="buttons">
+      <button onclick="adjustTime('end', 5)">></button>
+      <button onclick="adjustTime('end', 60)">»</button>
+    </div>
+  </div>
 
-  <p id="resultaat"></p>
+  <div class="row">
+    <div class="buttons">
+      <button onclick="adjustTime('pause', -60)">«</button>
+      <button onclick="adjustTime('pause', -5)"><</button>
+    </div>
+    <input id="pause" class="time" value="00:30" readonly />
+    <div class="buttons">
+      <button onclick="adjustTime('pause', 5)">></button>
+      <button onclick="adjustTime('pause', 60)">»</button>
+    </div>
+  </div>
+
+  <div id="totaal">Totaal: 9.5 u</div>
 
   <script>
-    function berekenUren() {
-      const start = document.getElementById('start').value;
-      const end = document.getElementById('end').value;
-      const pause = parseInt(document.getElementById('pause').value) || 0;
-
-      if (!start || !end) {
-        document.getElementById('resultaat').innerText = "Vul start- en eindtijd in.";
-        return;
-      }
-
-      const [sh, sm] = start.split(':').map(Number);
-      const [eh, em] = end.split(':').map(Number);
-
-      const startMinuten = sh * 60 + sm;
-      const eindMinuten = eh * 60 + em;
-      const gewerkteMinuten = Math.max(0, eindMinuten - startMinuten - pause);
-      const uren = (gewerkteMinuten / 60).toFixed(2);
-
-      document.getElementById('resultaat').innerText = `Gewerkte uren: ${uren}`;
+    function parseTime(t) {
+      const [h, m] = t.split(":").map(Number);
+      return h * 60 + m;
     }
+
+    function formatTime(totalMinutes) {
+      const h = Math.floor(totalMinutes / 60);
+      const m = totalMinutes % 60;
+      return ('0' + h).slice(-2) + ':' + ('0' + m).slice(-2);
+    }
+
+    function adjustTime(field, delta) {
+      const el = document.getElementById(field);
+      const time = parseTime(el.value);
+      let newTime = time + delta;
+      if (field === 'pause') {
+        newTime = Math.max(0, newTime); // geen negatieve pauze
+      } else {
+        newTime = (newTime + 1440) % 1440; // rond de klok
+      }
+      el.value = formatTime(newTime);
+      updateTotal();
+    }
+
+    function updateTotal() {
+      const start = parseTime(document.getElementById('start').value);
+      const end = parseTime(document.getElementById('end').value);
+      const pause = parseTime(document.getElementById('pause').value);
+
+      let worked = end - start - pause;
+      if (worked < 0) worked += 1440; // over middernacht
+
+      const uren = (worked / 60).toFixed(2);
+      document.getElementById('totaal').innerText = 'Totaal: ' + uren + ' u';
+    }
+
+    updateTotal(); // initiale berekening
   </script>
 </body>
 </html>
