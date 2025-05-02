@@ -1,20 +1,46 @@
-
 <!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Uren App</title>
   <style>
-    body { font-family: sans-serif; padding: 2rem; max-width: 500px; margin: auto; }
-    .row { display: flex; align-items: center; margin-bottom: 1rem; }
-    .buttons { display: flex; gap: 4px; }
-    input.time { font-size: 1.5rem; width: 100px; text-align: center; }
-    button { font-size: 1rem; padding: 0.5rem; }
-    #totaal { font-size: 1.5rem; margin-top: 2rem; }
+    body {
+      font-family: sans-serif;
+      padding: 1rem;
+      max-width: 100%;
+      margin: auto;
+      box-sizing: border-box;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .buttons {
+      display: flex;
+      gap: 4px;
+    }
+    input.time {
+      font-size: 1.6rem;
+      width: 80px;
+      text-align: center;
+    }
+    button {
+      font-size: 1rem;
+      padding: 1rem;
+    }
+    #totaal {
+      font-size: 1.6rem;
+      margin-top: 1.2rem;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <h1>Uren Calculator</h1>
+  <h1 style="text-align: center;">Uren Calculator</h1>
 
   <div class="row">
     <div class="buttons">
@@ -52,7 +78,7 @@
     </div>
   </div>
 
-  <div id="totaal">Totaal: 9.5 u</div>
+  <div id="totaal">Totaal: 08:30 u</div>
 
   <script>
     function parseTime(t) {
@@ -87,8 +113,9 @@
       let worked = end - start - pause;
       if (worked < 0) worked += 1440; // over middernacht
 
-      const uren = (worked / 60).toFixed(2);
-      document.getElementById('totaal').innerText = 'Totaal: ' + uren + ' u';
+      const uren = Math.floor(worked / 60);
+      const minuten = worked % 60;
+      document.getElementById('totaal').innerText = 'Totaal: ' + ('0' + uren).slice(-2) + ':' + ('0' + minuten).slice(-2) + ' u';
     }
 
     updateTotal(); // initiale berekening
